@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const Request = require('superagent')
+const Request = require('superagent');
 /* GET home page. */
 router.get('/', (req, res, next) => {
 	res.render('index', { title: 'Careaxiom Bamboo HR integration Services' });
