@@ -1,12 +1,15 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
 	var Feed = sequelize.define('Feed', {
-		feed_type: DataTypes.STRING,
-		feed_data: DataTypes.JSONB
+		feedType: {field: 'feed_type', type: DataTypes.STRING},
+		feedData: {field: 'feed_data' ,type: DataTypes.JSONB}
 	}, {
 		classMethods: {
 			associate: function(models) {
         // associations can be defined here
+			},
+			getTransaction: () => {
+				return sequelize.transaction();
 			}
 		}
 	});

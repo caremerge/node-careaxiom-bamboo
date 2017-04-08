@@ -4,12 +4,12 @@ module.exports = {
 		'password': process.env.DB_PASSWORD,
 		'database': process.env.DB_NAME,
 		'host': process.env.DB_HOST,
-		'dialect': 'postgres'
+		'dialect': 'postgres',
 	},
 	test: {
 		'username': 'root',
 		'password': null,
-		'database': 'database_test',
+		'database': 'careaxiom_bamboo',
 		'host': '127.0.0.1',
 		'dialect': 'postgres'
 	},

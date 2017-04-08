@@ -41,4 +41,5 @@ app.use(function(err, req, res, next) {
 	res.render('error');
 });
 App.Services = require('./services');
+App.Models = require('./models');
 module.exports = app;
