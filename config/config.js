@@ -1,8 +1,8 @@
 module.exports = {
 	development: {
-		'username': process.env.DB_USER,
+		'username': process.env.DB_USER || 'postgres',
 		'password': process.env.DB_PASSWORD,
-		'database': process.env.DB_NAME,
+		'database': process.env.DB_NAME || 'careaxiom_bamboo',
 		'host': process.env.DB_HOST,
 		'dialect': 'postgres',
 	},

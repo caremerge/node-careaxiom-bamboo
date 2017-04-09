@@ -34,7 +34,10 @@ module.exports.storeBirthdayFeed = () => {
 		return Feed.create({feedType, feedData}, {transaction});
 	})
 	.then(() => {transaction.commit();})
-	.catch(() => {transaction.rollback();});
+	.catch((error) => {
+		transaction.rollback();		
+		throw error;
+	});
 };
 
 module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
