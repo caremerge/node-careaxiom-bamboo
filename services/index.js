@@ -13,9 +13,8 @@ let _getEvents = (feed) => {
 		};
 	});
 };
-module.exports.storeBirthdayFeed = () => {
+let _storeFeed = ({feedType, feedId}) => {
 	let Feed = App.Models.Feed;
-	let feedType = 'birthdays';
 	let transaction = null;
 	return Feed.getTransaction()
 	.then((t) => {
@@ -23,21 +22,34 @@ module.exports.storeBirthdayFeed = () => {
 		return Feed.destroy({where: {feedType}, transaction});
 	})
 	.then(() => {
-		let id = process.env.BAMBOO_BIRTHDAY_FEED_ID; 
+		let id = feedId; 
 		return Request.get(process.env.BAMBOO_FEEDS_URL)
 			.query({id})		
 			.endAsync();
 	})
 	.then((response) => {
-		let birthdayFeed = ical2json.convert(response.text);
-		let feedData = _getEvents(birthdayFeed);
+		let feed = ical2json.convert(response.text);
+		let feedData = _getEvents(feed);
 		return Feed.create({feedType, feedData}, {transaction});
 	})
-	.then(() => {transaction.commit();})
+	.then((result) => {
+		transaction.commit();
+		return result;
+	})
 	.catch((error) => {
 		transaction.rollback();		
 		throw error;
 	});
+};
+module.exports.storeBirthdayFeed = () => {
+	let feedType = 'birthdays';
+	let feedId = process.env.BAMBOO_BIRTHDAY_FEED_ID;
+	return _storeFeed({feedType, feedId});
+};
+module.exports.storeAnniversaryFeed = () => {
+	let feedType = 'anniversaries';
+	let feedId = process.env.BAMBOO_ANNIVERSARY_FEED_ID;
+	return _storeFeed({feedType, feedId});
 };
 
 module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {

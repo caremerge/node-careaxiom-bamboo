@@ -16,7 +16,9 @@ router.get('/birthdays/employees', (req, res, next) => {
 		.catch(next);
 });
 router.post('/anniversaries', (req, res, next) => {
-	res.render('index', {title: 'Building Anniversaries'});
+	return App.Services.storeAnniversaryFeed()
+	.then(() => {res.status(201).end();})
+	.catch(next);
 });
 router.post('/whos-out', (req, res, next) => {
 	res.render('index', {title: 'Building Whos out'});
