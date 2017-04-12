@@ -51,7 +51,6 @@ module.exports.storeAnniversaryFeed = () => {
 	let feedId = process.env.BAMBOO_ANNIVERSARY_FEED_ID;
 	return _storeFeed({feedType, feedId});
 };
-
 module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 	if (!date) {
 		throw new Error('date not specified');
@@ -61,9 +60,26 @@ module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 	let feedType = 'birthdays';
 	let where = {feedType};
 	return Feed.find({where})
-	.then(({feedData = {}} = {}) => {
+	.then(({feedData = {}}) => {
 		return _.chain(feedData)
 						.filter((birthday) => birthday.startDate === date)
 						.map((birthday) => birthday.summary.split('-')[0].trim());
+	});
+};
+module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
+	let format = 'YYYYMMDD';
+	date = moment(date, 'DD/MM/YYYY').format(format);
+	let feedType = 'anniversaries';
+	let where = {feedType};
+	return App.Models.Feed.find({where})
+	.then(({feedData = {}}) => {
+		return _.chain(feedData)
+						.filter((anniversary) => anniversary.startDate === date)
+						.map((anniversary) => {
+							return {
+								name: anniversary.summary.split('(')[0].trim(),
+								count: anniversary.summary.split('(')[1][0]
+							};
+						});
 	});
 };

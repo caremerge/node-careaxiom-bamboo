@@ -11,6 +11,9 @@ router.post('/birthdays', (req, res, next) => {
 });
 router.get('/birthdays/employees', (req, res, next) => {
 	let date = req.query.date;
+	if (!date) {
+		throw new Error('date not specified');
+	}
 	return App.Services.getBirthdayEmployees({date})
 		.then((result) => {res.json(result);})
 		.catch(next);
@@ -18,6 +21,15 @@ router.get('/birthdays/employees', (req, res, next) => {
 router.post('/anniversaries', (req, res, next) => {
 	return App.Services.storeAnniversaryFeed()
 	.then(() => {res.status(201).end();})
+	.catch(next);
+});
+router.get('/anniversaries/employees', (req, res, next) => {
+	let date = req.query.date;
+	if (!date) {
+		throw new Error('date not specified');
+	}
+	return App.Services.getAnniversaryEmployees({date})
+	.then((result) => {res.json(result);})
 	.catch(next);
 });
 router.post('/whos-out', (req, res, next) => {
