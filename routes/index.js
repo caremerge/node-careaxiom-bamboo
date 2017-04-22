@@ -35,4 +35,8 @@ router.get('/anniversaries/employees', (req, res, next) => {
 router.post('/whos-out', (req, res, next) => {
 	res.render('index', {title: 'Building Whos out'});
 });
+router.post('/employees', (req, res, next) => {
+	return App.Services.updateEmployeeDirectory()
+	.then(() => {res.status(201).end();});
+});
 module.exports = router;

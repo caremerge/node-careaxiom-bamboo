@@ -84,15 +84,21 @@ module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
 	});
 };
 module.exports.updateEmployeeDirectory = () => {
+	let Employee = App.Models.employee;
 	return Promise.try(() => {
 		return Request.get(urlJoin(process.env.BAMBOO_API_URL, 'employees', 'directory'))
 		.set('Accept', 'application/json')
 		.auth(process.env.BAMBOO_API_KEY, 'x')
 		.endAsync();
 	}).then((response) => {
-		let employeeData = _.map(response.body.employees, (employee) => {
+		let employees = _.map(response.body.employees, (employee) => {
 			return {data: employee, employeeId: employee.id};
 		});
-		return App.Models.Employee.bulkCreate(employeeData, {updateOnDuplicate: ['data']});
+		return App.Models.sequelize.transaction(function(transaction) {
+			return Employee.destroy({truncate: true, transaction})
+			.then(() => {
+				return Employee.bulkCreate(employees, {transaction});
+			});
+		});
 	});
 };

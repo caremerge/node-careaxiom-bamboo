@@ -1,3 +1,7 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+if (process.env.NODE_ENV === 'development') {
+	require('dotenv').config();
+}
 module.exports = {
 	development: {
 		'username': process.env.DB_USER,
@@ -20,4 +24,4 @@ module.exports = {
 		'host': process.env.DB_HOST,
 		'dialect': 'postgres'
 	}
-}; 
+};
