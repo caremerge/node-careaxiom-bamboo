@@ -23,7 +23,7 @@ module.exports = {
 				type: Sequelize.DATE
 			}
 		}).then(() => {
-			return queryInterface.addIndex('employees', ['fk_user_id', 'employeeId'], {
+			return queryInterface.addIndex('employees', ['employeeId'], {
 				name: 'idxEmployeeId',
 				type: 'unique'
 			});
