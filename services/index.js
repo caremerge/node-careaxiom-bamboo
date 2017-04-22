@@ -3,7 +3,7 @@ const Request = Promise.promisifyAll(require('superagent'));
 const ical2json = require('ical2json');
 const _ = require('lodash');
 const moment = require('moment');
-
+const urlJoin = require('url-join');
 let _getEvents = (feed) => {
 	return _.map(feed.VCALENDAR[0].VEVENT, (event) => {
 		return {
@@ -81,5 +81,18 @@ module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
 								count: anniversary.summary.split('(')[1][0]
 							};
 						});
+	});
+};
+module.exports.updateEmployeeDirectory = () => {
+	return Promise.try(() => {
+		return Request.get(urlJoin(process.env.BAMBOO_API_URL, 'employees', 'directory'))
+		.set('Accept', 'application/json')
+		.auth(process.env.BAMBOO_API_KEY, 'x')
+		.endAsync();
+	}).then((response) => {
+		let employeeData = _.map(response.body.employees, (employee) => {
+			return {data: employee, employeeId: employee.id};
+		});
+		return App.Models.Employee.bulkCreate(employeeData, {updateOnDuplicate: ['data']});
 	});
 };
