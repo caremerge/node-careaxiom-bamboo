@@ -57,30 +57,48 @@ module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 	}
 	date = moment(date, 'DD/MM/YYYY').format('YYYYMMDD');
 	let Feed = App.Models.Feed;
+	let Employee = App.Models.employee;
 	let feedType = 'birthdays';
 	let where = {feedType};
 	return Feed.find({where})
 	.then(({feedData = {}}) => {
-		return _.chain(feedData)
+		let employeeNames = _.chain(feedData)
 						.filter((birthday) => birthday.startDate === date)
 						.map((birthday) => birthday.summary.split('-')[0].trim());
+		return Employee.findAllByName({employeeNames});
 	});
 };
 module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
 	let format = 'YYYYMMDD';
-	date = moment(date, 'DD/MM/YYYY').format(format);
+	let Feed = App.Models.Feed;
+	let Employee = App.Models.employee;
 	let feedType = 'anniversaries';
 	let where = {feedType};
-	return App.Models.Feed.find({where})
+	let employeeData = [];
+
+	date = moment(date, 'DD/MM/YYYY').format(format);	
+	return Feed.find({where})
 	.then(({feedData = {}}) => {
-		return _.chain(feedData)
-						.filter((anniversary) => anniversary.startDate === date)
-						.map((anniversary) => {
-							return {
-								name: anniversary.summary.split('(')[0].trim(),
-								count: anniversary.summary.split('(')[1][0]
-							};
-						});
+		employeeData =  _.chain(feedData)
+				.filter((anniversary) => anniversary.startDate === date)
+				.map((anniversary) => {
+					return {
+						name: anniversary.summary.split('(')[0].trim(),
+						count: anniversary.summary.split('(')[1][0]
+					};
+				})
+				.value();
+		let employeeNames = _.map(employeeData, 'name');
+		if (_.isEmpty(employeeNames)) {
+			return [];
+		}
+		return Employee.findAllByName({employeeNames});
+	})
+	.then((employees) => {
+		_.each(employees, (employee) => {
+			employee.anniversaryCount = _.find(employeeData, (arg) => arg.name === employee.name).count;
+		});
+		return employees;
 	});
 };
 module.exports.updateEmployeeDirectory = () => {
