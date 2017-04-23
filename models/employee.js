@@ -47,6 +47,7 @@ module.exports = function(sequelize, DataTypes) {
 		anniversaryCount: function(value) {
 			this.setDataValue('anniversaryCount', value);
 		},
+		//Umar Muneer (Time off - 1 day)
 		timeOff: function(value) {
 			this.setDataValue('timeOff', value);
 		}

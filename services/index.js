@@ -71,7 +71,6 @@ module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 						.filter((birthday) => birthday.startDate === date)
 						.map((birthday) => birthday.summary.split('-')[0].trim())
 						.value();
-		console.log(employeeNames, '####');
 		return Employee.findAllByName({employeeNames});
 	});
 };
