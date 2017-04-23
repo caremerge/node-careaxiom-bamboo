@@ -32,11 +32,23 @@ router.get('/anniversaries/employees', (req, res, next) => {
 	.then((result) => {res.json(result);})
 	.catch(next);
 });
-router.post('/whos-out', (req, res, next) => {
-	res.render('index', {title: 'Building Whos out'});
+router.post('/who-is-out', (req, res, next) => {
+	return App.Services.storeWhoIsOutFeed()
+	.then(() => {res.status(201).end();})
+	.catch(next);
+});
+router.get('/who-is-out/employees', (req, res, next) => {
+	let date = req.query.date;
+	if (!date) {
+		throw new Error('date not specified');
+	}
+	return App.Services.getWhoIsOutEmployees({date})
+	.then((result) => {res.json(result);})
+	.catch(next);
 });
 router.post('/employees', (req, res, next) => {
 	return App.Services.updateEmployeeDirectory()
-	.then(() => {res.status(201).end();});
+	.then(() => {res.status(201).end();})
+	.catch(next);
 });
 module.exports = router;

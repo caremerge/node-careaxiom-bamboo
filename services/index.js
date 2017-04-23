@@ -51,6 +51,11 @@ module.exports.storeAnniversaryFeed = () => {
 	let feedId = process.env.BAMBOO_ANNIVERSARY_FEED_ID;
 	return _storeFeed({feedType, feedId});
 };
+module.exports.storeWhoIsOutFeed = () => {
+	let feedType = 'whoisout';
+	let feedId = process.env.BAMBOO_WHOISOUT_FEED_ID;
+	return _storeFeed({feedType, feedId});
+};
 module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 	if (!date) {
 		throw new Error('date not specified');
@@ -64,7 +69,9 @@ module.exports.getBirthdayEmployees = ({date = '20/08/2017'}) => {
 	.then(({feedData = {}}) => {
 		let employeeNames = _.chain(feedData)
 						.filter((birthday) => birthday.startDate === date)
-						.map((birthday) => birthday.summary.split('-')[0].trim());
+						.map((birthday) => birthday.summary.split('-')[0].trim())
+						.value();
+		console.log(employeeNames, '####');
 		return Employee.findAllByName({employeeNames});
 	});
 };
@@ -89,14 +96,41 @@ module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
 				})
 				.value();
 		let employeeNames = _.map(employeeData, 'name');
-		if (_.isEmpty(employeeNames)) {
-			return [];
-		}
 		return Employee.findAllByName({employeeNames});
 	})
 	.then((employees) => {
 		_.each(employees, (employee) => {
 			employee.anniversaryCount = _.find(employeeData, (arg) => arg.name === employee.name).count;
+		});
+		return employees;
+	});
+};
+module.exports.getWhoIsOutEmployees = ({date = '01/01/2017'}) => {
+	date = parseInt(moment(date, 'DD/MM/YYYY').format('YYYYMMDD'));
+	let Feed = App.Models.Feed;
+	let Employee = App.Models.employee;
+	let feedType = 'whoisout';
+	let where = {feedType};
+	let employeeData = [];
+	return Feed.find({where})
+	.then(({feedData = {}}) => {
+		employeeData = _.chain(feedData)
+			.filter((record) => {
+				return parseInt(record.startDate) <= date && parseInt(record.endDate) >= date;
+			})
+			.map((record) => {
+				return {
+					name: record.summary.split('(')[0].trim(),
+					timeOff: record.summary.split('(')[1].split(')')[0]
+				};
+			})
+			.value();
+		let employeeNames = _.map(employeeData, 'name');
+		return Employee.findAllByName({employeeNames});
+	})
+	.then(function(employees) {
+		_.each(employees, (employee) => {
+			employee.timeOff = _.find(employeeData, (arg) => arg.name === employee.name).timeOff;
 		});
 		return employees;
 	});

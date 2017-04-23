@@ -1,5 +1,6 @@
 'use strict';
 const Promise = require('bluebird');
+const _ = require('lodash');
 module.exports = function(sequelize, DataTypes) {
 	let classMethods = {
 		associate: function() {
@@ -15,6 +16,9 @@ module.exports = function(sequelize, DataTypes) {
 					}
 				});
 			};
+			if (_.isEmpty(_.compact(employeeNames))) {
+				return [];
+			}
 			return Promise.map(employeeNames, _find);
 		}
 	};
@@ -27,11 +31,24 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		email: function() {
 			return this.getDataValue('data').workEmail;
+		},
+		timeOff: function() {
+			let desc =  this.getDataValue('timeOff');
+			if (_.isEmpty(desc)) {
+				return undefined;
+			}
+			return {
+				type: desc.split('-')[0].trim(),
+				duration: desc.split('-')[1].trim()
+			};
 		}
 	};
 	let setterMethods = {
 		anniversaryCount: function(value) {
 			this.setDataValue('anniversaryCount', value);
+		},
+		timeOff: function(value) {
+			this.setDataValue('timeOff', value);
 		}
 	};
 	var employee = sequelize.define('employee', {
