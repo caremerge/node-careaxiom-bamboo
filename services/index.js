@@ -83,15 +83,17 @@ module.exports.getAnniversaryEmployees = ({date='01/01/2017'}) => {
 	let employeeData = [];
 
 	date = moment(date, 'DD/MM/YYYY').format(format);	
+
 	return Feed.find({where})
 	.then(({feedData = {}}) => {
 		employeeData =  _.chain(feedData)
 				.filter((anniversary) => anniversary.startDate === date)
 				.map((anniversary) => {
-					return {
-						name: anniversary.summary.split('(')[0].trim(),
-						count: anniversary.summary.split('(')[1][0]
-					};
+					let summary = anniversary.summary;
+					let splitterIndex = summary.lastIndexOf('(');
+					let name = summary.substr(0, splitterIndex).trim();
+					let count = summary.substr(splitterIndex, summary.length - splitterIndex);
+					return {name, count};
 				})
 				.value();
 		let employeeNames = _.map(employeeData, 'name');
