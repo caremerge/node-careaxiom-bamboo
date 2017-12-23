@@ -120,10 +120,11 @@ module.exports.getWhoIsOutEmployees = ({date = '01/01/2017'}) => {
 				return parseInt(record.startDate) <= date && parseInt(record.endDate) >= date;
 			})
 			.map((record) => {
-				return {
-					name: record.summary.split('(')[0].trim(),
-					timeOff: record.summary.split('(')[1].split(')')[0]
-				};
+				let summary = record.summary;
+				let splitterIndex = summary.lastIndexOf('(');
+				let name = summary.substr(0, splitterIndex).trim();
+				let timeOff = summary.substr(splitterIndex+1, summary.length-1 - splitterIndex);
+				return {name, timeOff};
 			})
 			.value();
 		let employeeNames = _.map(employeeData, 'name');
