@@ -51,4 +51,5 @@ router.post('/employees', (req, res, next) => {
 	.then(() => {res.status(201).end();})
 	.catch(next);
 });
+router.use('/google', require('./oauth'));
 module.exports = router;
