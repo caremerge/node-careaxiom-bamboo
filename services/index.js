@@ -156,3 +156,4 @@ module.exports.updateEmployeeDirectory = () => {
 		});
 	});
 };
+module.exports.Google = require('./google');
